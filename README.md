@@ -17,8 +17,7 @@ and tracks the main player using a speed-optimized YOLO pipeline.
 
 ## Installation
 ```bash
-pip install ultralytics opencv-python numpy
-pip install openvino
+pip install requirements.txt
 ```
 
 ## Usage
