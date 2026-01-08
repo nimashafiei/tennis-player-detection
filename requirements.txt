@@ -1,0 +1,4 @@
+ultralytics==8.3.247
+opencv-python==4.9.0.80
+numpy==1.26.3
+openvino==2025.4.1
