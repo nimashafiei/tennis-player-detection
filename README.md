@@ -5,7 +5,7 @@ Automatically detects the net line, splits the court into near/far halves,
 and tracks the main player using a speed-optimized YOLO pipeline.
 
 ## Demo
-![me]https://github.com/nimashafiei/tennis-player-detection/blob/main/out_player.gif 
+![me](https://github.com/nimashafiei/tennis-player-detection/blob/main/out_player.gif)
 
 ## Features
 - Automatic net-line detection
