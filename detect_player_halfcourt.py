@@ -5,7 +5,7 @@ import numpy as np
 from ultralytics import YOLO
 
 
-def find_net_line(frame):
+def estimate_horizontal_reference(frame):
     """
     Detect an (approximately) horizontal tennis net line using HoughLinesP.
 
@@ -179,7 +179,7 @@ def main():
     model = YOLO(args.model)
 
     # Detect net line once on the first frame (fast, but assumes camera is fixed)
-    net_p1, net_p2 = find_net_line(first)
+    net_p1, net_p2 = estimate_horizontal_reference(first)
 
     # -----------------------------
     # HOLD state (used when det_every > 1)
