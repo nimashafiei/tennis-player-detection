@@ -277,6 +277,10 @@ def main():
 
                     tid = int(ids[i]) if ids is not None else -1
 
+                    # Prefer keeping the same track ID to reduce flicker (only when tracking is enabled)
+                    stability_bonus = 1.3 if (use_track_now and last_id is not None and tid == last_id and tid != -1) else 1.0
+                    score = c * stability_bonus
+
                     # Choose best purely by confidence (simple & stable)
                     score = c
                     if score > best_score:
