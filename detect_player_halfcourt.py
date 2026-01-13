@@ -7,7 +7,7 @@ from ultralytics import YOLO
 
 def estimate_horizontal_reference(frame):
     """
-    Detect an (approximately) horizontal tennis net line using HoughLinesP.
+    Detect an approximately horizontal reference line in the image using HoughLinesP.
 
     Returns:
         (p1, p2): Two points (x, y) defining the chosen line segment.
@@ -18,7 +18,7 @@ def estimate_horizontal_reference(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Edge detection (tune thresholds if net is missed)
+    # Edge detection (tune thresholds if the reference line is not detected)
     edges = cv2.Canny(gray, 60, 160)
 
     H, W = gray.shape[:2]
@@ -40,8 +40,7 @@ def estimate_horizontal_reference(frame):
 
     best = None
     best_score = -1
-    target_y = 0.55 * H  # heuristic: net tends to be around mid-height
-
+    target_y = 0.55 * H  
     # Score candidates: prefer long, near-horizontal segments close to target_y
     for l in lines[:, 0]:
         x1, y1, x2, y2 = map(int, l)
@@ -91,15 +90,21 @@ def y_on_line(p1, p2, x):
 
 def in_half(cx, cy, net_p1, net_p2, half="far"):
     """
-    Decide whether a point (cx, cy) lies in the requested half-court,
-    based on whether it is above or below the net line.
+    Decide whether a point (cx, cy) lies on the selected side of a
+    horizontal reference line in image space.
+
+    The decision is made by comparing the point's y-coordinate with the
+    y-value of the reference line at the same x-position.
 
     Args:
-        half: "far"  -> above the net (typically farther from camera)
-              "near" -> below the net (typically closer to camera)
+        cx, cy: Point coordinates (e.g., detection center) in image pixels.
+        net_p1, net_p2: Two endpoints defining the reference line.
+        half: "far"  -> selects points above the reference line
+              "near" -> selects points below the reference line
     """
     y_net = y_on_line(net_p1, net_p2, cx)
     return (cy < y_net) if half == "far" else (cy > y_net)
+
 
 
 def main():
@@ -178,7 +183,7 @@ def main():
     # -----------------------------
     model = YOLO(args.model)
 
-    # Detect net line once on the first frame (fast, but assumes camera is fixed)
+    # Estimate a stable horizontal reference line once from the first frame (assumes fixed camera)
     net_p1, net_p2 = estimate_horizontal_reference(first)
 
     # -----------------------------
@@ -197,7 +202,7 @@ def main():
     # Aspect ratio here is (h / w) because a standing person is taller than wide.
     AR_MIN, AR_MAX = 1.1, 8.0
     MIN_AREA = 0.00003 * (W * H)   # allow small far players
-    MAX_AREA = 0.10 * (W * H)      # reject huge boxes (e.g., walls/net)
+    MAX_AREA = 0.10 * (W * H)      # reject huge boxes 
 
     while True:
         ret, frame = cap.read()
